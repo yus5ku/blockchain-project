@@ -1,7 +1,5 @@
-from flask import Flask
-from flask import jsonify
+from flask import Flask, jsonify, request
 import time
-from flask import request
 from argparse import ArgumentParser
 import multiprocessing
 
