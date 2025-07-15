@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 cache = {}
 
+#ブロックチェーンを定義
 def get_blockchain():
     if 'blockchain' not in cache:
         # 初期化
