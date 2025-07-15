@@ -10,16 +10,16 @@ import wallet
 
 app = Flask(__name__)
 
-cashe = {}
-cashe['blockchain'] = blockchain1.BlockChain()
+cache = {}
+cache['blockchain'] = blockchain1.BlockChain()
 
 def get_blockchain():
-    if 'blockchain' in cashe:
-        return cashe['blockchain']
+    if 'blockchain' in cache:
+        return cache['blockchain']
     else:
         # 初期化やエラー処理
         miners_wallet = wallet.Wallet()
-        cashed_blockchain = blockchain1.BlockChain(
+        cached_blockchain = blockchain1.BlockChain(
             blockchain_address=miners_wallet.blockchain_address,
             port=app.config['port'])
         app.logger.warning({
@@ -28,7 +28,7 @@ def get_blockchain():
             'blockchain_address': miners_wallet.blockchain_address,
             'timestamp': time.time()
         })
-        return cashe['blockchain']
+        return cache['blockchain']
 
 @app.route('/chain', methods=['GET'])
 def get_chain():
@@ -107,6 +107,19 @@ def mine():
 def start_mine():
     get_blockchain().start_mining()
     return ('', 204)
+
+@app.route('/amount', methods=['GET'])
+def get_amount():
+    blockchain_address = request.args.get('blockchain_address')
+    if not blockchain_address:
+        return jsonify({'message': 'Missing blockchain_address parameter'}), 400
+    
+    block_chain = get_blockchain()
+    amount = block_chain.calculate_total_amount(blockchain_address)
+    response = {
+        'amount': amount
+    }
+    return jsonify(response), 200
 
 def parse_ports(port_arg: str):
     """カンマ区切りで複数ポート指定可能"""

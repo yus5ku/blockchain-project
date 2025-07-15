@@ -9,7 +9,8 @@ import requests
 
 from wallet import Wallet, Transaction
 
-app =Flask(__name__, template_folder='./templates')
+app = Flask(__name__, template_folder='./templates')
+cache = {}
 
 @app.route('/')
 def index():
@@ -74,19 +75,19 @@ def calculate_amount():
     my_blockchain_address = request.args.get('blockchain_address')
     response = requests.get(
         urllib.parse.urljoin(app.config['gw'],'amount'),
-        {'blockchain_address': my_blockchain_address},
+        params={'blockchain_address': my_blockchain_address},
         timeout=3)
     if response.status_code == 200:
         total = response.json()['amount']
         return jsonify({'message':'success', 'amount': total}), 200
-    return jsonify({'message':'fail','error': response.content}),400
+    return jsonify({'message':'fail','error': response.text}),400
 
 @app.route('/wallet_info', methods=['GET'])
 def wallet_info():
-    miners_wallet = cashe.get('wallet')
+    miners_wallet = cache.get('wallet')
     if not miners_wallet:
-        miners_wallet = wallet.Wallet()
-        cashe['wallet'] = miners_wallet
+        miners_wallet = Wallet()
+        cache['wallet'] = miners_wallet
     return jsonify({
         'private_key': miners_wallet.private_key,
         'public_key': miners_wallet.public_key,

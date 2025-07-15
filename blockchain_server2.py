@@ -8,13 +8,13 @@ import wallet
 
 app = Flask(__name__)
 
-cashe = {}
+cache = {}
 
 def get_blockchain():
-    if 'blockchain' not in cashe:
+    if 'blockchain' not in cache:
         # 初期化
         miners_wallet = wallet.Wallet()
-        cashe['blockchain'] = blockchain1.BlockChain(
+        cache['blockchain'] = blockchain1.BlockChain(
             blockchain_address=miners_wallet.blockchain_address,
             port=app.config.get('port'),
             ports=app.config.get('ports', [])
@@ -25,7 +25,7 @@ def get_blockchain():
             'blockchain_address': miners_wallet.blockchain_address,
             'timestamp': time.time()
         })
-    return cashe['blockchain']
+    return cache['blockchain']
 
 @app.route('/chain', methods=['GET', 'PUT'])
 def get_chain():
@@ -132,6 +132,8 @@ def run_server(port: int, all_ports: list):
     
     # ここで正しいポート情報でBlockChainを初期化してからネイバー同期を開始
     get_blockchain().sync_neighbours()
+    # Start mining automatically after initializing the blockchain
+    get_blockchain().start_mining()
 
     app.run(host='0.0.0.0', port=port, threaded=True, debug=False)
 
