@@ -13,7 +13,7 @@ app = Flask(__name__)
 cache = {}
 cache['blockchain'] = blockchain1.BlockChain()
 
-def get_blockchain():
+#def get_blockchain():
     if 'blockchain' in cache:
         return cache['blockchain']
     else:
